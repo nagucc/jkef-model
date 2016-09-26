@@ -74,17 +74,22 @@ export default class EntityManager {
     }));
   }
 
-  findById(_id) {
+  findOne(query = {}) {
     return new Promise((resolve, reject) => this.useEntity(async col => {
       try {
-        const result = await col.findOne({ _id });
+        const result = await col.findOne(query);
         resolve(result);
       } catch (e) {
-        console.log('[EntityManager findById]Error: ', e); // eslint-disable-line no-console
+        console.log('[EntityManager findOne]Error: ', e); // eslint-disable-line no-console
         reject(e);
       }
     }));
   }
+
+  findById(_id) {
+    return this.findOne({ _id });
+  }
+
   removeById(_id) {
     return new Promise((resolve, reject) => this.useEntity(async col => {
       try {

@@ -54,6 +54,8 @@ Promise
 
 ### listByRecord({ project, year, text, skip = 0, limit = 100, fieldsForFilter = ['name', 'phone'] } = {})
 
-  ### findById(_id)
+### findById(_id)
 
-  ### removeById(_id)
+### removeById(_id)
+
+### findOneByIdCardNumber(number)

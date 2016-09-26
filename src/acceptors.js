@@ -114,6 +114,10 @@ export default class AcceptorManager extends EntityManager {
     }
   }
 
+  findOneByIdCardNumber(number) {
+    return super.findOne({ 'idCard.number': number });
+  }
+
   async list({ text, skip = 0, limit = 100, fieldsForFilter = ['name', 'phone'] } = {
     skip: 0, limit: 100, fieldsForFilter: ['name', 'phone']
   }) {

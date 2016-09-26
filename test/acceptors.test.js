@@ -51,19 +51,25 @@ describe('AcceptorManager 类', () => {
     });
   });
 
-  describe('根据Id查找Acceptor', () => {
+  describe('查找Acceptor', () => {
     it('Id不存在时，返回null', async () => {
       const wrongId = Math.random();
       const result = await manager.findById(wrongId);
       expect(result).to.be.null;
     });
-    it('Id正确时发挥正确的结果', async () => {
+    it('Id正确时返回正确的结果', async () => {
       const result = await manager.findById(docId);
       expect(result).to.eql(rawDoc);
     });
+
+    it('根据IdCard.number查找Acceptor', async () => {
+      const result = await manager.findOneByIdCardNumber(rawDoc.idCard.number);
+      expect(result).to.be.ok;
+      expect(result._id).to.eql(rawDoc._id);
+    });
   });
 
-  describe('根据Id更新Acceptor', () => {
+  describe('根据Id更新Acceptor', async () => {
     it('正常更新', async () => {
       await manager.updateById({
         ...rawDoc, ...updatedDoc,
