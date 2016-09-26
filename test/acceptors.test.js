@@ -47,7 +47,7 @@ describe('AcceptorManager 类', () => {
       }));
     it('正确添加', async () => {
       const result = await manager.insert(rawDoc);
-      expect(result.insertedId).to.eql(docId);
+      expect(result).to.eql(docId);
     });
   });
 

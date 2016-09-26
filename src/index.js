@@ -3,6 +3,6 @@
 eslint-disable no-console
  */
 
-import 'babel-polyfill';
+import AcceptorManager from './acceptors';
 
-console.log('hello');
+export default AcceptorManager;

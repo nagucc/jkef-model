@@ -14,11 +14,16 @@ export default class AcceptorManager extends EntityManager {
   constructor(mongoUrl, collectionName = ACCEPTORS_COLLECTION) {
     super(collectionName, mongoUrl);
   }
-  insert({ idCard, ...other }) {
-    if (!idCard || !idCard.type || !idCard.number) {
+  async insert({ idCard: { type, number }, ...other }) {
+    if (!type || !number) {
       return Promise.reject('证件类型和号码不能为空');
     }
-    return super.insert({ idCard, ...other });
+    try {
+      const result = await super.insert({ idCard: { type, number }, ...other });
+      return Promise.resolve(result.insertedId);
+    } catch (e) {
+      return Promise.reject(e);
+    }
   }
   updateById(acceptor) {
     // _id, eduHistory, careerHistory, records 这几个字段不能更新
