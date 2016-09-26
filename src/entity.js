@@ -44,7 +44,7 @@ export default class EntityManager {
  * @param  {number} skip  =             0   跳过开头的结果
  * @return {Promise}       操作结果
  */
-  find(query = {}, limit = 100, skip = 0) {
+  find({ query = {}, limit = 100, skip = 0 }) {
     console.log('[EntityManager find]query::', JSON.stringify(query));
     return new Promise((resolve, reject) => this.useEntity(async col => {
       let result;
@@ -79,6 +79,17 @@ export default class EntityManager {
       try {
         const result = await col.findOne({ _id });
         resolve(result);
+      } catch (e) {
+        console.log('[EntityManager findById]Error: ', e); // eslint-disable-line no-console
+        reject(e);
+      }
+    }));
+  }
+  removeById(_id) {
+    return new Promise((resolve, reject) => this.useEntity(async col => {
+      try {
+        await col.remove({ _id }, { single: true });
+        resolve();
       } catch (e) {
         console.log('[EntityManager findById]Error: ', e); // eslint-disable-line no-console
         reject(e);

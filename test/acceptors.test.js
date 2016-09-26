@@ -1,9 +1,8 @@
 /*
+eslint-disable no-unused-expressions, no-underscore-dangle
 eslint-env mocha
  */
-/*
-eslint-disable no-unused-expressions
- */
+
 import { expect } from 'chai';
 import 'babel-polyfill';
 import AcceptorManager from '../src/acceptors';
@@ -19,6 +18,8 @@ describe('AcceptorManager 类', () => {
       number: Math.random(),
     },
     otherInfo: 'some',
+    name: 'myname',
+    phone: 'myphone',
   };
 
   const updatedDoc = {
@@ -73,174 +74,219 @@ describe('AcceptorManager 类', () => {
     });
   });
 
-  describe('添加教育经历', () => {
-    describe('name和year不能为空, year必须是整数', () => {
-      [
-        { name: null, year: null },
-        { name: 'test', year: null },
-        { name: null, year: 2011 },
-        { name: 'test', year: '2011.1' },
-      ].map(edu =>
-        it(JSON.stringify(edu), async () => {
-          try {
-            await manager.addEdu(docId, edu);
-            throw new Error('It should not go here');
-          } catch (e) {
-            expect(e).is.ok;
-          }
-        }));
+  describe('教育经历', () => {
+    const edu = { name: 'xx大学', year: 2013, other: 'some' };
+    const edu2 = { name: 'xx大学2', year: 2018, other: 'some' };
+    describe('添加', () => {
+      describe('name和year不能为空, year必须是整数', () => {
+        [
+          { name: null, year: null },
+          { name: 'test', year: null },
+          { name: null, year: 2011 },
+          { name: 'test', year: '2011.1' },
+        ].map(ed =>
+          it(JSON.stringify(ed), async () => {
+            try {
+              await manager.addEdu(docId, ed);
+              throw new Error('It should not go here');
+            } catch (e) {
+              expect(e).is.ok;
+            }
+          }));
+      });
+      it('正常添加', async () => {
+        await manager.addEdu(docId, edu);
+
+        const result = await manager.findById(docId);
+        expect(result.eduHistory.length).to.eql(1);
+        expect(result.eduHistory.some(his =>
+          his.name === edu.name && his.year === edu.year && his.other === edu.other
+        )).to.be.true;
+      });
     });
-    it('正常添加', async () => {
-      const edu = { name: '本科', year: 2013, other: 'some' };
-      await manager.addEdu(docId, edu);
+    describe('删除', () => {
+      describe('name和year不能为空, year必须是整数', () =>
+        [
+          { name: 'test', year: null },
+          { name: null, year: 2011 },
+          { name: 'test', year: '2011.1' },
+        ].map(ed =>
+          it(JSON.stringify(ed), async () => {
+            try {
+              await manager.removeEdu(docId, ed);
+              throw new Error('It should not go here');
+            } catch (e) {
+              expect(e).is.ok;
+            }
+          })));
+      it('正常删除', async () => {
+        await manager.addEdu(docId, edu2);
 
-      const result = await manager.findById(docId);
-      expect(result.eduHistory.some(his =>
-        his.name === edu.name && his.year === edu.year && his.other === edu.other
-      )).to.be.true;
-    });
-  });
+        let result = await manager.findById(docId);
+        expect(result.eduHistory.length).to.eql(2);
 
-  describe('添加工作经历', () => {
-    describe('name和year不能为空, year必须是整数', () => {
-      [
-        { name: null, year: null },
-        { name: 'test', year: null },
-        { name: null, year: 2011 },
-        { name: 'test', year: '2011.1' },
-      ].map(career =>
-        it(JSON.stringify(career), async () => {
-          try {
-            await manager.addCareer(docId, career);
-            throw new Error('It should not go here');
-          } catch (e) {
-            expect(e).is.ok;
-          }
-        }));
-    });
-    it('正常添加', async () => {
-      const career = { name: 'xx公司', year: 2013, other: 'some' };
-      await manager.addCareer(docId, career);
-
-      const result = await manager.findById(docId);
-      expect(result.careerHistory.some(his =>
-        his.name === career.name && his.year === career.year && his.other === career.other
-      )).to.be.true;
-    });
-  });
-
-  describe('添加奖助记录', () => {
-    describe('project、amount和date不能为空, amount必须是整数,date必须是Date类型', () =>
-      [
-        { project: '测试', amount: 342222, date: null },
-        { project: 'test', amount: null, date: new Date() },
-        { project: null, amount: 4332, date: new Date() },
-        { project: 'test', amount: '3443', date: new Date() },
-        { project: 'test', amount: 3443, date: 1443333000 },
-      ].map(record =>
-        it(JSON.stringify(record), async () => {
-          try {
-            await manager.addRecord(docId, record);
-            throw new Error('It should not go here');
-          } catch (e) {
-            expect(e).is.ok;
-          }
-        })));
-    it('正常添加', async () => {
-      const record = {
-        project: 'test',
-        amount: 98700,
-        date: new Date(),
-        other: 'some',
-      };
-      await manager.addRecord(docId, record);
-
-      const result = await manager.findById(docId);
-      expect(result.records.some(his =>
-        his.project === record.project
-        && his.amount === record.amount
-        && his.date.valueOf() === record.date.valueOf()
-        && his.other === record.other
-      )).to.be.true;
+        await manager.removeEdu(docId, { name: edu2.name, year: edu2.year });
+        result = await manager.findById(docId);
+        expect(result.eduHistory.length).to.eql(1);
+        expect(result.eduHistory.some(his =>
+          his.name === edu.name && his.year === edu.year && his.other === edu.other
+        )).to.be.true;
+      });
     });
   });
 
-  // it('findByIdCardNumber 可根据idCard.number找到数据', async () => {
-  //   const gettedDoc = await findByIdCardNumber(rawDoc.idCard.number);
-  //   const { eduHistory, careerHistory, ...data } = gettedDoc;
-  //   expect(eduHistory).eql([edu]);
-  //   expect(careerHistory).eql([career]);
-  //   expect(data).to.eql(rawDoc);
-  // });
-  //
-  // it('addAcceptor 当保存相同idCard.number的acceptor时，添加失败', async () => {
-  //   const newDoc = {
-  //     ...rawDoc,
-  //     _id: Math.random(),
-  //   };
-  //   try {
-  //     await addAcceptor(newDoc);
-  //     throw new Error('不应该运行到这里');
-  //   } catch (e) {
-  //     expect(e).to.be.ok;
-  //   }
-  // });
-  //
-  // it('update 可根据_id更新数据，但不会更新_id字段', async () => {
-  //   await update(docId, { _id: docId, ...updatedDoc });
-  //   const { eduHistory, careerHistory, ...gettedDoc } = // eslint-disable-line no-unused-vars
-  //     await findByIdCardNumber(updatedDoc.idCard.number);
-  //   expect(gettedDoc).to.eql({ _id: docId, ...updatedDoc });
-  // });
-  //
-  // it('findAcceptors 不使用参数能查出不超过20条记录', async () => {
-  //   try {
-  //     const { data, totalCount } = await findAcceptors();
-  //     expect(totalCount).to.above(0);
-  //     expect(data.length).to.below(21);
-  //     expect(data[0].name).to.be.not.null; // eslint-disable-line no-unused-expressions
-  //   } catch (e) {
-  //     throw e;
-  //   }
-  // });
-  //
-  // it('findAcceptors 使用limit参数限制取出的数目', async () => {
-  //   try {
-  //     const { data, totalCount } = await findAcceptors({ limit: 1 });
-  //     expect(totalCount).to.above(0);
-  //     expect(data.length).to.eql(1);
-  //     expect(data[0].name).to.be.not.null; // eslint-disable-line no-unused-expressions
-  //   } catch (e) {
-  //     throw e;
-  //   }
-  // });
-  //
-  // it('findAcceptors 使用skip跳过前面的内容', async () => {
-  //   try {
-  //     const { data, totalCount } = await findAcceptors({ skip: 99999999 });
-  //     expect(totalCount).to.above(0);
-  //     expect(data.length).to.eql(0);
-  //   } catch (e) {
-  //     throw e;
-  //   }
-  // });
-  //
-  // it('findAcceptors 无参数查询', async () => {
-  //   const list = await findAcceptors();
-  //   expect(list.data.length).to.above(0);
-  // });
-  //
-  // it('findAcceptors 根据project查询，找出所有包含指定项目记录的人', async () => {
-  //   const list = await findAcceptors({ project: '奖学金', limit: 500 });
-  //   if (list.data.totalCount >= 500) expect(list.data.length).to.above(499);
-  //   expect(list.data.length).to.above(0);
-  //   list.data.forEach(doc => {
-  //     if (doc.records) {
-  //       expect(doc.records.some.bind(doc.records, rec => rec.project === '奖学金'));
-  //     }
-  //   });
-  // });
-  //
+  describe('工作经历', () => {
+    const career = { name: 'xx公司', year: 2013, other: 'some' };
+    const career2 = { name: 'xx公司2', year: 2015, other: 'some2' };
+    describe('添加', () => {
+      describe('name和year不能为空, year必须是整数', () => {
+        [
+          { name: null, year: null },
+          { name: 'test', year: null },
+          { name: null, year: 2011 },
+          { name: 'test', year: '2011.1' },
+        ].map(car =>
+          it(JSON.stringify(car), async () => {
+            try {
+              await manager.addCareer(docId, car);
+              throw new Error('It should not go here');
+            } catch (e) {
+              expect(e).is.ok;
+            }
+          }));
+      });
+      it('正常添加', async () => {
+        await manager.addCareer(docId, career);
+
+        const result = await manager.findById(docId);
+        expect(result.careerHistory.some(his =>
+          his.name === career.name && his.year === career.year && his.other === career.other
+        )).to.be.true;
+      });
+    });
+    describe('删除', () => {
+      describe('name和year不能为空, year必须是整数', () =>
+        [
+          { name: 'test', year: null },
+          { name: null, year: 2011 },
+          { name: 'test', year: '2011.1' },
+        ].map(car =>
+          it(JSON.stringify(car), async () => {
+            try {
+              await manager.removeCareer(docId, car);
+              throw new Error('It should not go here');
+            } catch (e) {
+              expect(e).is.ok;
+            }
+          })));
+      it('正常删除', async () => {
+        await manager.addCareer(docId, career2);
+
+        let result = await manager.findById(docId);
+        expect(result.careerHistory.length).to.eql(2);
+
+        await manager.removeCareer(docId, { name: career2.name, year: career2.year });
+        result = await manager.findById(docId);
+        expect(result.careerHistory.length).to.eql(1);
+        expect(result.careerHistory.some(his =>
+          his.name === career.name && his.year === career.year && his.other === career.other
+        )).to.be.true;
+      });
+    });
+  });
+
+  describe('奖助记录', () => {
+    const record = {
+      project: 'test',
+      amount: 98700,
+      date: new Date(1934, 4, 4),
+      other: 'some',
+    };
+    const record2 = {
+      project: 'test2',
+      amount: 987400,
+      date: new Date(1937, 2, 2),
+      other: 'some2',
+    };
+    describe('添加', () => {
+      describe('project、amount和date不能为空, amount必须是整数,date必须是Date类型', () =>
+        [
+          { project: '测试', amount: 342222, date: null },
+          { project: 'test', amount: null, date: new Date() },
+          { project: null, amount: 4332, date: new Date() },
+          { project: 'test', amount: '3443', date: new Date() },
+          { project: 'test', amount: 3443, date: 1443333000 },
+        ].map(rec =>
+          it(JSON.stringify(rec), async () => {
+            try {
+              await manager.addRecord(docId, rec);
+              throw new Error('It should not go here');
+            } catch (e) {
+              expect(e).is.ok;
+            }
+          })));
+      it('正常添加', async () => {
+        record._id = await manager.addRecord(docId, record);
+        expect(record._id).to.be.ok;
+
+        const result = await manager.findById(docId);
+        expect(result.records.some(his =>
+          his.project === record.project
+          && his.amount === record.amount
+          && his.date.valueOf() === record.date.valueOf()
+          && his.other === record.other
+        )).to.be.true;
+      });
+    });
+    describe('删除', () => {
+      it('正常删除', async () => {
+        const idNeedRemove = await manager.addRecord(docId, record2);
+
+        let result = await manager.findById(docId);
+        expect(result.records.length).to.eql(2);
+
+        await manager.removeRecord(docId, idNeedRemove);
+        result = await manager.findById(docId);
+        expect(result.records.length).to.eql(1);
+      });
+    });
+  });
+
+  describe('列出Acceptors', () => {
+    describe('按分页列出', () => {
+      it('默认列出开头100个数据', async () => {
+        const result = await manager.list();
+        expect(result.totalCount).to.above(0);
+        expect(result.data.length).to.above(0);
+      });
+      it('跳过开头数据', async () => {
+        const result = await manager.list({ skip: 100 });
+        expect(result.totalCount).to.above(0);
+        expect(result.data.length).to.eql(0);
+      });
+      it('根据姓名和电话筛选', async () => {
+        const result = await manager.list({ text: 'my' });
+        expect(result.totalCount).to.eql(1);
+      });
+    });
+    describe('根据奖助记录信息筛选', () => {
+      it('根据年份和项目名称筛选', async () => {
+        const result = await manager.listByRecord({
+          project: 'test',
+          year: 1934,
+        });
+        expect(result.data.length).to.eql(1);
+        expect(result.totalCount).to.above(0);
+      });
+    });
+  });
+
+  describe('根据Id删除Acceptor', () => {
+    it('正常删除', async () => {
+      await manager.removeById(docId);
+    });
+  });
+
   // it('按项目统计数据', async () => {
   //   try {
   //     await computeStatByProject();

@@ -1,4 +1,8 @@
+/*
+eslint-disable no-underscore-dangle
+ */
 import { useCollection } from 'mongo-use-collection';
+import { ObjectId } from 'mongodb';
 import EntityManager from './entity';
 
 const { all } = Promise;
@@ -53,20 +57,126 @@ export default class AcceptorManager extends EntityManager {
       careerHistory: { name, year, ...other },
     } });
   }
-  addRecord(_id, { project, amount, date, ...other }) {
+  async removeCareer(_id, { name, year }) {
+    if (!name || !year) return Promise.reject('name和year不能为空');
+    if (!Number.isInteger(year)) return Promise.reject('year必须是整数');
+    try {
+      const oldDoc = await super.findById(_id);
+      const filtered = oldDoc.careerHistory.filter(car =>
+        !(car.name === name && car.year === year));
+      await super.update({ _id }, {
+        $set: {
+          careerHistory: filtered,
+        },
+      });
+      return Promise.resolve();
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+  async addRecord(_id, { id, project, amount, date, ...other }) {
     if (!project || !amount || !date) return Promise.reject('project、amount和date不能为空');
     if (!Number.isInteger(amount)) return Promise.reject('amount必须是整数');
     if (!date.getFullYear) return Promise.reject('date必须是Date类型');
-    return super.update({ _id }, {
-      $addToSet: {
-        records: {
-          project,
-          amount,
-          date,
-          ...other,
+    if (!id) id = new ObjectId(); // eslint-disable-line no-param-reassign
+    try {
+      await super.update({ _id }, {
+        $addToSet: {
+          records: {
+            _id: id,
+            project,
+            amount,
+            date,
+            ...other,
+          },
         },
-      },
-    });
+      });
+      return Promise.resolve(id);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+  async removeRecord(_id, recordId) {
+    try {
+      const oldDoc = await super.findById(_id);
+      const records = oldDoc.records.filter(record => !record._id.equals(recordId));
+      await super.update({ _id }, {
+        $set: { records },
+      });
+      return Promise.resolve();
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  async list({ text, skip = 0, limit = 100, fieldsForFilter = ['name', 'phone'] } = {
+    skip: 0, limit: 100, fieldsForFilter: ['name', 'phone']
+  }) {
+    let query = {};
+    if (text) {
+      if (!fieldsForFilter || !fieldsForFilter.length) {
+        return Promise.reject('当text有值时，fieldsForFilter字段不能为空');
+      }
+      const reg = new RegExp(text);
+      query = Object.assign(query, {
+        $or: fieldsForFilter.map(field => ({ [field]: reg })),
+      });
+    }
+    try {
+      const result = await Promise.all([
+        super.count(query),
+        super.find({ query, skip, limit }),
+      ]);
+      return Promise.resolve({
+        totalCount: result[0],
+        data: result[1],
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+  async listByRecord({ project, year, text,
+    skip = 0, limit = 100, fieldsForFilter = ['name', 'phone'] } = {}) {
+    let query = {};
+    if (text) {
+      if (!fieldsForFilter || !fieldsForFilter.length) {
+        return Promise.reject('当text有值时，fieldsForFilter字段不能为空');
+      }
+      const reg = new RegExp(text);
+      query = Object.assign(query, {
+        $or: fieldsForFilter.map(field => ({ [field]: reg })),
+      });
+    }
+    if (project) {
+      query = Object.assign(query, {
+        'records.project': project,
+      });
+    }
+
+    if (year) {
+      query = Object.assign(query, {
+        records: {
+          $elemMatch: {
+            date: {
+              $gte: new Date(year, 0, 1),
+              $lt: new Date(year + 1, 0, 1),
+            },
+          },
+        },
+      });
+    }
+    try {
+      const result = await Promise.all([
+        super.count(query),
+        super.find({ query, skip, limit }),
+      ]);
+      return Promise.resolve({
+        totalCount: result[0],
+        data: result[1],
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
   }
 }
 
@@ -254,57 +364,3 @@ export const remove = async _id =>
       reject(e);
     }
   }));
-
-
-export const removeEdu = async (_id, eduHistory) =>
-  new Promise((resolve, reject) =>
-    useAcceptors(async col => {
-      try {
-        const oldDoc = await findById(_id);
-        const filtered = oldDoc.eduHistory.filter(edu =>
-          !(edu.name === eduHistory.name && edu.year === eduHistory.year));
-        await col.updateOne({ _id }, {
-          $set: {
-            eduHistory: filtered,
-          },
-        });
-        resolve();
-      } catch (e) {
-        reject(e);
-      }
-    }));
-
-
-export const removeCareer = async (_id, careerHistory) =>
-  new Promise((resolve, reject) =>
-    useAcceptors(async col => {
-      try {
-        const oldDoc = await findById(_id);
-        oldDoc.careerHistory = oldDoc.careerHistory.filter(career =>
-          career.name !== careerHistory.name || career.year !== careerHistory);
-        await col.updateOne({ _id }, {
-          $set: {
-            careerHistory: oldDoc.careerHistory,
-          },
-        });
-        resolve();
-      } catch (e) {
-        reject(e);
-      }
-    }));
-
-export const removeRecord = async (_id, recordId) =>
-  new Promise((resolve, reject) =>
-    useAcceptors(async col => {
-      try {
-        const oldDoc = await findById(_id);
-        const records = oldDoc.records.filter(record =>
-          record._id !== recordId);
-        await col.updateOne({ _id }, {
-          $set: { records },
-        });
-        resolve();
-      } catch (e) {
-        reject(e);
-      }
-    }));

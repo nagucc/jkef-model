@@ -43,7 +43,8 @@
   },
   "dependencies": {
     "babel-runtime": "^6.6.1",
-    "mongo-use-collection": "^0.1.0"
+    "mongo-use-collection": "^0.1.0",
+    "mongodb": "^2.2.10"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",
