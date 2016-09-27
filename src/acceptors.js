@@ -191,7 +191,7 @@ export default class AcceptorManager extends EntityManager {
   computeStatByProject() {
     const map = function () { // eslint-disable-line
       if (this.records) {
-        this.records.forEach(function (record) { // eslint-disable-line
+        this.records.forEach(record => {
           if (record.isDeleted) return;
           emit(record.project, { // eslint-disable-line
             amount: record.amount / 1000,
@@ -201,19 +201,16 @@ export default class AcceptorManager extends EntityManager {
         });
       }
     };
-    const reduce = function (key, values) { // eslint-disable-line
-      var amount = 0, count = 0, lastUpdated = 0; // eslint-disable-line
+    const reduce = (key, values) => {
+      let amount = 0;
+      let count = 0;
+      let lastUpdated = 0;
       values.forEach(val => {
         amount += val.amount;
         count += val.count;
         lastUpdated = Math.max(lastUpdated, +val.lastUpdated);
       });
-      // mongodb 中不支持shorthand
-      return {
-        amount: amount, // eslint-disable-line object-shorthand
-        count: count, // eslint-disable-line object-shorthand
-        lastUpdated: lastUpdated, // eslint-disable-line object-shorthand
-      };
+      return { amount, count, lastUpdated };
     };
 
     return super.mapReduce(map, reduce, {
@@ -231,7 +228,7 @@ export default class AcceptorManager extends EntityManager {
   computeStatByYear() {
     const map = function () { // eslint-disable-line
       if (this.records) {
-        this.records.forEach(function (record) { // eslint-disable-line
+        this.records.forEach(record => {
           if (record.isDeleted) return;
           emit(record.date.getYear() + 1900, { // eslint-disable-line
             amount: record.amount / 1000,
@@ -241,19 +238,16 @@ export default class AcceptorManager extends EntityManager {
         });
       }
     };
-    const reduce = function (key, values) { // eslint-disable-line
-      var amount = 0, count = 0, lastUpdated = 0; // eslint-disable-line
+    const reduce = (key, values) => {
+      let amount = 0;
+      let count = 0;
+      let lastUpdated = 0;
       values.forEach((val) => {
         amount += val.amount;
         count += val.count;
-        lastUpdated = Math.max(lastUpdated, +val.lastUpdated);
+        lastUpdated = Math.max(lastUpdated, val.lastUpdated);
       });
-      // mongodb 中不支持shorthand
-      return {
-        amount: amount, // eslint-disable-line object-shorthand
-        count: count, // eslint-disable-line object-shorthand
-        lastUpdated: lastUpdated, // eslint-disable-line object-shorthand
-      };
+      return { amount, count, lastUpdated };
     };
 
     return super.mapReduce(map, reduce, {

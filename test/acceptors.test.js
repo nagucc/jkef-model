@@ -74,13 +74,13 @@ describe('AcceptorManager 类', () => {
       await manager.computeStatByProject();
       const result = await manager.getStatByProject();
       expect(result.length).to.be.above(0);
-      expect(result.find(item => item._id === 'test').value.amount).to.be.above(0);
+      expect(result.find(item => item._id === 'test').value.amount).to.be.above(0); // eslint-disable-line
     });
     it('按年份统计', async () => {
       await manager.computeStatByYear();
       const result = await manager.getStatByYear();
       expect(result.length).to.be.above(0);
-      expect(result.find(item => item._id === 1934).value.amount).to.be.above(0);
+      expect(result.find(item => item._id === 1934).value.amount).to.be.above(0); // eslint-disable-line
     });
   });
 
@@ -247,8 +247,8 @@ describe('AcceptorManager 类', () => {
             }
           })));
       it('正常添加', async () => {
-        record._id = await manager.addRecord(docId, record);
-        expect(record._id).to.be.ok;
+        record._id = await manager.addRecord(docId, record); // eslint-disable-line
+        expect(record._id).to.be.ok; // eslint-disable-line
 
         const result = await manager.findById(docId);
         expect(result.records.some(his =>
