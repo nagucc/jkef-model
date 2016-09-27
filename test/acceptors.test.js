@@ -65,7 +65,22 @@ describe('AcceptorManager 类', () => {
     it('根据IdCard.number查找Acceptor', async () => {
       const result = await manager.findOneByIdCardNumber(rawDoc.idCard.number);
       expect(result).to.be.ok;
-      expect(result._id).to.eql(rawDoc._id);
+      expect(result._id).to.eql(rawDoc._id); // eslint-disable-line
+    });
+  });
+
+  describe('统计', () => {
+    it('按项目名称统计', async () => {
+      await manager.computeStatByProject();
+      const result = await manager.getStatByProject();
+      expect(result.length).to.be.above(0);
+      expect(result.find(item => item._id === 'test').value.amount).to.be.above(0);
+    });
+    it('按年份统计', async () => {
+      await manager.computeStatByYear();
+      const result = await manager.getStatByYear();
+      expect(result.length).to.be.above(0);
+      expect(result.find(item => item._id === 1934).value.amount).to.be.above(0);
     });
   });
 
@@ -272,7 +287,7 @@ describe('AcceptorManager 类', () => {
       });
       it('根据姓名和电话筛选', async () => {
         const result = await manager.list({ text: 'my' });
-        expect(result.totalCount).to.eql(1);
+        expect(result.totalCount).to.above(0);
       });
     });
     describe('根据奖助记录信息筛选', () => {
@@ -281,17 +296,17 @@ describe('AcceptorManager 类', () => {
           project: 'test',
           year: 1934,
         });
-        expect(result.data.length).to.eql(1);
+        expect(result.data.length).to.above(0);
         expect(result.totalCount).to.above(0);
       });
     });
   });
 
-  describe('根据Id删除Acceptor', () => {
-    it('正常删除', async () => {
-      await manager.removeById(docId);
-    });
-  });
+  // describe('根据Id删除Acceptor', () => {
+  //   it('正常删除', async () => {
+  //     await manager.removeById(docId);
+  //   });
+  // });
 
   // it('按项目统计数据', async () => {
   //   try {
