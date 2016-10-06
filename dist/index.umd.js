@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('babel-runtime/helpers/typeof'), require('babel-runtime/helpers/defineProperty'), require('babel-runtime/core-js/object/assign'), require('babel-runtime/core-js/number/is-integer'), require('babel-runtime/regenerator'), require('babel-runtime/helpers/extends'), require('babel-runtime/core-js/promise'), require('babel-runtime/helpers/objectWithoutProperties'), require('babel-runtime/helpers/asyncToGenerator'), require('babel-runtime/core-js/object/get-prototype-of'), require('babel-runtime/helpers/classCallCheck'), require('babel-runtime/helpers/createClass'), require('babel-runtime/helpers/possibleConstructorReturn'), require('babel-runtime/helpers/get'), require('babel-runtime/helpers/inherits'), require('mongo-use-collection'), require('mongodb'), require('babel-runtime/core-js/json/stringify')) :
-  typeof define === 'function' && define.amd ? define(['babel-runtime/helpers/typeof', 'babel-runtime/helpers/defineProperty', 'babel-runtime/core-js/object/assign', 'babel-runtime/core-js/number/is-integer', 'babel-runtime/regenerator', 'babel-runtime/helpers/extends', 'babel-runtime/core-js/promise', 'babel-runtime/helpers/objectWithoutProperties', 'babel-runtime/helpers/asyncToGenerator', 'babel-runtime/core-js/object/get-prototype-of', 'babel-runtime/helpers/classCallCheck', 'babel-runtime/helpers/createClass', 'babel-runtime/helpers/possibleConstructorReturn', 'babel-runtime/helpers/get', 'babel-runtime/helpers/inherits', 'mongo-use-collection', 'mongodb', 'babel-runtime/core-js/json/stringify'], factory) :
-  (global.jkef-model = factory(global._typeof,global._defineProperty,global._Object$assign,global._Number$isInteger,global._regeneratorRuntime,global._extends,global._Promise,global._objectWithoutProperties,global._asyncToGenerator,global._Object$getPrototypeOf,global._classCallCheck,global._createClass,global._possibleConstructorReturn,global._get,global._inherits,global.mongoUseCollection,global.mongodb,global._JSON$stringify));
-}(this, function (_typeof,_defineProperty,_Object$assign,_Number$isInteger,_regeneratorRuntime,_extends,_Promise,_objectWithoutProperties,_asyncToGenerator,_Object$getPrototypeOf,_classCallCheck,_createClass,_possibleConstructorReturn,_get,_inherits,mongoUseCollection,mongodb,_JSON$stringify) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('babel-runtime/helpers/typeof'), require('babel-runtime/helpers/defineProperty'), require('babel-runtime/core-js/object/assign'), require('babel-runtime/core-js/number/is-integer'), require('babel-runtime/regenerator'), require('babel-runtime/helpers/extends'), require('babel-runtime/core-js/promise'), require('babel-runtime/helpers/objectWithoutProperties'), require('babel-runtime/helpers/asyncToGenerator'), require('babel-runtime/core-js/object/get-prototype-of'), require('babel-runtime/helpers/classCallCheck'), require('babel-runtime/helpers/createClass'), require('babel-runtime/helpers/possibleConstructorReturn'), require('babel-runtime/helpers/get'), require('babel-runtime/helpers/inherits'), require('mongodb'), require('babel-runtime/core-js/json/stringify'), require('mongo-use-collection')) :
+  typeof define === 'function' && define.amd ? define(['babel-runtime/helpers/typeof', 'babel-runtime/helpers/defineProperty', 'babel-runtime/core-js/object/assign', 'babel-runtime/core-js/number/is-integer', 'babel-runtime/regenerator', 'babel-runtime/helpers/extends', 'babel-runtime/core-js/promise', 'babel-runtime/helpers/objectWithoutProperties', 'babel-runtime/helpers/asyncToGenerator', 'babel-runtime/core-js/object/get-prototype-of', 'babel-runtime/helpers/classCallCheck', 'babel-runtime/helpers/createClass', 'babel-runtime/helpers/possibleConstructorReturn', 'babel-runtime/helpers/get', 'babel-runtime/helpers/inherits', 'mongodb', 'babel-runtime/core-js/json/stringify', 'mongo-use-collection'], factory) :
+  (global.jkef-model = factory(global._typeof,global._defineProperty,global._Object$assign,global._Number$isInteger,global._regeneratorRuntime,global._extends,global._Promise,global._objectWithoutProperties,global._asyncToGenerator,global._Object$getPrototypeOf,global._classCallCheck,global._createClass,global._possibleConstructorReturn,global._get,global._inherits,global.mongodb,global._JSON$stringify,global.mongoUseCollection));
+}(this, function (_typeof,_defineProperty,_Object$assign,_Number$isInteger,_regeneratorRuntime,_extends,_Promise,_objectWithoutProperties,_asyncToGenerator,_Object$getPrototypeOf,_classCallCheck,_createClass,_possibleConstructorReturn,_get,_inherits,mongodb,_JSON$stringify,mongoUseCollection) { 'use strict';
 
   _typeof = 'default' in _typeof ? _typeof['default'] : _typeof;
   _defineProperty = 'default' in _defineProperty ? _defineProperty['default'] : _defineProperty;
@@ -29,7 +29,7 @@
      * @param  {String} collectionName Entity使用的集合的名称
      * @param  {String} mongoUrl       所使用的数据库的连接字符串
      */
-    function EntityManager(collectionName, mongoUrl) {
+    function EntityManager(mongoUrl, collectionName) {
       _classCallCheck(this, EntityManager);
 
       this.collectionName = collectionName;
@@ -104,8 +104,10 @@
 
     }, {
       key: 'find',
-      value: function find(_ref2) {
+      value: function find() {
         var _this2 = this;
+
+        var _ref2 = arguments.length <= 0 || arguments[0] === undefined ? { query: {}, limit: 100, skip: 0 } : arguments[0];
 
         var _ref2$query = _ref2.query;
         var query = _ref2$query === undefined ? {} : _ref2$query;
@@ -114,7 +116,6 @@
         var _ref2$skip = _ref2.skip;
         var skip = _ref2$skip === undefined ? 0 : _ref2$skip;
 
-        console.log('[EntityManager find]query::', _JSON$stringify(query));
         return new _Promise(function (resolve, reject) {
           return _this2.useEntity(function () {
             var _ref3 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee2(col) {
@@ -125,34 +126,36 @@
                     case 0:
                       result = void 0;
                       _context2.prev = 1;
+
+                      console.log('[EntityManager find][' + col.collectionName + ']query::', _JSON$stringify(query));
                       cursor = col.find(query).skip(skip).limit(limit);
-                      _context2.next = 5;
+                      _context2.next = 6;
                       return cursor.toArray();
 
-                    case 5:
+                    case 6:
                       result = _context2.sent;
 
                       console.log('[EntityManager find]', col.collectionName, '::result.length::', result.length);
                       resolve(result);
-                      _context2.next = 14;
+                      _context2.next = 15;
                       break;
 
-                    case 10:
-                      _context2.prev = 10;
+                    case 11:
+                      _context2.prev = 11;
                       _context2.t0 = _context2['catch'](1);
 
                       console.log('[EntityManager find]Error: ', _context2.t0); // eslint-disable-line no-console
                       reject(_context2.t0);
 
-                    case 14:
+                    case 15:
                     case 'end':
                       return _context2.stop();
                   }
                 }
-              }, _callee2, _this2, [[1, 10]]);
+              }, _callee2, _this2, [[1, 11]]);
             }));
 
-            return function (_x2) {
+            return function (_x3) {
               return _ref3.apply(this, arguments);
             };
           }());
@@ -201,16 +204,18 @@
               }, _callee3, _this3, [[0, 8]]);
             }));
 
-            return function (_x4) {
+            return function (_x5) {
               return _ref4.apply(this, arguments);
             };
           }());
         });
       }
     }, {
-      key: 'findById',
-      value: function findById(_id) {
+      key: 'findOne',
+      value: function findOne() {
         var _this4 = this;
+
+        var query = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
         return new _Promise(function (resolve, reject) {
           return _this4.useEntity(function () {
@@ -222,7 +227,7 @@
                     case 0:
                       _context4.prev = 0;
                       _context4.next = 3;
-                      return col.findOne({ _id: _id });
+                      return col.findOne(query);
 
                     case 3:
                       result = _context4.sent;
@@ -235,7 +240,7 @@
                       _context4.prev = 7;
                       _context4.t0 = _context4['catch'](0);
 
-                      console.log('[EntityManager findById]Error: ', _context4.t0); // eslint-disable-line no-console
+                      console.log('[EntityManager findOne]Error: ', _context4.t0); // eslint-disable-line no-console
                       reject(_context4.t0);
 
                     case 11:
@@ -246,11 +251,16 @@
               }, _callee4, _this4, [[0, 7]]);
             }));
 
-            return function (_x5) {
+            return function (_x7) {
               return _ref5.apply(this, arguments);
             };
           }());
         });
+      }
+    }, {
+      key: 'findById',
+      value: function findById(_id) {
+        return this.findOne({ _id: _id });
       }
     }, {
       key: 'removeById',
@@ -288,7 +298,7 @@
               }, _callee5, _this5, [[0, 6]]);
             }));
 
-            return function (_x6) {
+            return function (_x8) {
               return _ref6.apply(this, arguments);
             };
           }());
@@ -344,8 +354,52 @@
               }, _callee6, _this6, [[0, 7]]);
             }));
 
-            return function (_x8) {
+            return function (_x10) {
               return _ref8.apply(this, arguments);
+            };
+          }());
+        });
+      }
+    }, {
+      key: 'mapReduce',
+      value: function mapReduce(map, reduce, options) {
+        var _this7 = this;
+
+        return new _Promise(function (resolve, reject) {
+          return _this7.useEntity(function () {
+            var _ref9 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee7(col) {
+              var result;
+              return _regeneratorRuntime.wrap(function _callee7$(_context7) {
+                while (1) {
+                  switch (_context7.prev = _context7.next) {
+                    case 0:
+                      _context7.prev = 0;
+                      _context7.next = 3;
+                      return col.mapReduce(map, reduce, options);
+
+                    case 3:
+                      result = _context7.sent;
+
+                      resolve(result);
+                      _context7.next = 10;
+                      break;
+
+                    case 7:
+                      _context7.prev = 7;
+                      _context7.t0 = _context7['catch'](0);
+
+                      reject(_context7.t0);
+
+                    case 10:
+                    case 'end':
+                      return _context7.stop();
+                  }
+                }
+              }, _callee7, _this7, [[0, 7]]);
+            }));
+
+            return function (_x11) {
+              return _ref9.apply(this, arguments);
             };
           }());
         });
@@ -354,11 +408,6 @@
 
     return EntityManager;
   }();
-
-  var _this2 = this;
-
-  var all = _Promise.all;
-
 
   var ACCEPTORS_COLLECTION = 'acceptors';
   var STAT_BY_PROJECT = 'stat_by_project';
@@ -372,7 +421,11 @@
 
       _classCallCheck(this, AcceptorManager);
 
-      return _possibleConstructorReturn(this, (AcceptorManager.__proto__ || _Object$getPrototypeOf(AcceptorManager)).call(this, collectionName, mongoUrl));
+      var _this = _possibleConstructorReturn(this, (AcceptorManager.__proto__ || _Object$getPrototypeOf(AcceptorManager)).call(this, mongoUrl, collectionName));
+
+      _this.statByProjectCollectionName = collectionName + '.' + STAT_BY_PROJECT;
+      _this.statByYearCollectionName = collectionName + '.' + STAT_BY_YEAR;
+      return _this;
     }
 
     _createClass(AcceptorManager, [{
@@ -716,6 +769,11 @@
         return removeRecord;
       }()
     }, {
+      key: 'findOneByIdCardNumber',
+      value: function findOneByIdCardNumber(number) {
+        return _get(AcceptorManager.prototype.__proto__ || _Object$getPrototypeOf(AcceptorManager.prototype), 'findOne', this).call(this, { 'idCard.number': number });
+      }
+    }, {
       key: 'list',
       value: function () {
         var _ref12 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee6() {
@@ -812,7 +870,7 @@
           var _ref16$fieldsForFilte = _ref16.fieldsForFilter;
           var fieldsForFilter = _ref16$fieldsForFilte === undefined ? ['name', 'phone'] : _ref16$fieldsForFilte;
 
-          var query, _ret2, result;
+          var query, _ret2, elemMatch, result;
 
           return _regeneratorRuntime.wrap(function _callee7$(_context7) {
             while (1) {
@@ -847,46 +905,48 @@
                   return _context7.abrupt('return', _ret2.v);
 
                 case 5:
-                  if (project) {
-                    query = _Object$assign(query, {
-                      'records.project': project
-                    });
-                  }
+                  if (project || year) {
+                    elemMatch = {};
 
-                  if (year) {
+                    if (project) {
+                      elemMatch = _extends({}, elemMatch, { project: project });
+                    }
+                    if (year) {
+                      elemMatch = _extends({}, elemMatch, {
+                        date: {
+                          $gte: new Date(year, 0, 1),
+                          $lt: new Date(year + 1, 0, 1)
+                        }
+                      });
+                    }
                     query = _Object$assign(query, {
                       records: {
-                        $elemMatch: {
-                          date: {
-                            $gte: new Date(year, 0, 1),
-                            $lt: new Date(year + 1, 0, 1)
-                          }
-                        }
+                        $elemMatch: elemMatch
                       }
                     });
                   }
-                  _context7.prev = 7;
-                  _context7.next = 10;
+                  _context7.prev = 6;
+                  _context7.next = 9;
                   return _Promise.all([_get(AcceptorManager.prototype.__proto__ || _Object$getPrototypeOf(AcceptorManager.prototype), 'count', this).call(this, query), _get(AcceptorManager.prototype.__proto__ || _Object$getPrototypeOf(AcceptorManager.prototype), 'find', this).call(this, { query: query, skip: skip, limit: limit })]);
 
-                case 10:
+                case 9:
                   result = _context7.sent;
                   return _context7.abrupt('return', _Promise.resolve({
                     totalCount: result[0],
                     data: result[1]
                   }));
 
-                case 14:
-                  _context7.prev = 14;
-                  _context7.t0 = _context7['catch'](7);
+                case 13:
+                  _context7.prev = 13;
+                  _context7.t0 = _context7['catch'](6);
                   return _context7.abrupt('return', _Promise.reject(_context7.t0));
 
-                case 17:
+                case 16:
                 case 'end':
                   return _context7.stop();
               }
             }
-          }, _callee7, this, [[7, 14]]);
+          }, _callee7, this, [[6, 13]]);
         }));
 
         function listByRecord(_x13) {
@@ -895,397 +955,90 @@
 
         return listByRecord;
       }()
+    }, {
+      key: 'computeStatByProject',
+      value: function computeStatByProject() {
+        var map = function map() {
+          // eslint-disable-line
+          if (this.records) {
+            this.records.forEach(function (record) {
+              if (record.isDeleted) return;
+              emit(record.project, { // eslint-disable-line
+                amount: record.amount / 1000,
+                count: 1,
+                lastUpdated: record.date
+              });
+            });
+          }
+        };
+        var reduce = function reduce(key, values) {
+          var amount = 0;
+          var count = 0;
+          var lastUpdated = 0;
+          values.forEach(function (val) {
+            amount += val.amount;
+            count += val.count;
+            lastUpdated = Math.max(lastUpdated, +val.lastUpdated);
+          });
+          return { amount: amount, count: count, lastUpdated: lastUpdated };
+        };
+
+        return _get(AcceptorManager.prototype.__proto__ || _Object$getPrototypeOf(AcceptorManager.prototype), 'mapReduce', this).call(this, map, reduce, {
+          out: {
+            replace: this.statByProjectCollectionName
+          }
+        });
+      }
+    }, {
+      key: 'getStatByProject',
+      value: function getStatByProject() {
+        var manager = new EntityManager(this.mongoUrl, this.statByProjectCollectionName);
+        return manager.find();
+      }
+    }, {
+      key: 'computeStatByYear',
+      value: function computeStatByYear() {
+        var map = function map() {
+          // eslint-disable-line
+          if (this.records) {
+            this.records.forEach(function (record) {
+              if (record.isDeleted) return;
+              emit(record.date.getYear() + 1900, { // eslint-disable-line
+                amount: record.amount / 1000,
+                count: 1,
+                lastUpdated: record.date
+              });
+            });
+          }
+        };
+        var reduce = function reduce(key, values) {
+          var amount = 0;
+          var count = 0;
+          var lastUpdated = 0;
+          values.forEach(function (val) {
+            amount += val.amount;
+            count += val.count;
+            lastUpdated = Math.max(lastUpdated, val.lastUpdated);
+          });
+          return { amount: amount, count: count, lastUpdated: lastUpdated };
+        };
+
+        return _get(AcceptorManager.prototype.__proto__ || _Object$getPrototypeOf(AcceptorManager.prototype), 'mapReduce', this).call(this, map, reduce, {
+          out: {
+            replace: this.statByYearCollectionName
+          }
+        });
+      }
+    }, {
+      key: 'getStatByYear',
+      value: function getStatByYear() {
+        var manager = new EntityManager(this.mongoUrl, this.statByYearCollectionName);
+        return manager.find();
+      }
     }]);
 
     return AcceptorManager;
   }(EntityManager);
-
-  var useAcceptors = function useAcceptors(cb) {
-    return mongoUseCollection.useCollection(mongoUrl, ACCEPTORS_COLLECTION, cb);
-  };
-  var computeStatByProject = function () {
-    var _ref18 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee9() {
-      return _regeneratorRuntime.wrap(function _callee9$(_context9) {
-        while (1) {
-          switch (_context9.prev = _context9.next) {
-            case 0:
-              return _context9.abrupt('return', new _Promise(function (resolve, reject) {
-                return useAcceptors(function () {
-                  var _ref19 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee8(col) {
-                    var map, reduce;
-                    return _regeneratorRuntime.wrap(function _callee8$(_context8) {
-                      while (1) {
-                        switch (_context8.prev = _context8.next) {
-                          case 0:
-                            map = function map() {
-                              // eslint-disable-line
-                              if (this.records) {
-                                this.records.forEach(function (record) {
-                                  // eslint-disable-line
-                                  if (record.isDeleted) return;
-                                  emit(record.project, { // eslint-disable-line
-                                    amount: record.amount / 1000,
-                                    count: 1,
-                                    lastUpdated: record.date
-                                  });
-                                });
-                              }
-                            };
-
-                            reduce = function reduce(key, values) {
-                              // eslint-disable-line
-                              var amount = 0,
-                                  count = 0,
-                                  lastUpdated = 0; // eslint-disable-line
-                              values.forEach(function (val) {
-                                amount += val.amount;
-                                count += val.count;
-                                lastUpdated = Math.max(lastUpdated, +val.lastUpdated);
-                              });
-                              // mongodb 中不支持shorthand
-                              return {
-                                amount: amount, // eslint-disable-line object-shorthand
-                                count: count, // eslint-disable-line object-shorthand
-                                lastUpdated: lastUpdated };
-                            };
-
-                            _context8.prev = 2;
-                            _context8.next = 5;
-                            return col.mapReduce(map, reduce, {
-                              out: {
-                                replace: STAT_BY_PROJECT
-                              }
-                            });
-
-                          case 5:
-                            resolve();
-                            _context8.next = 11;
-                            break;
-
-                          case 8:
-                            _context8.prev = 8;
-                            _context8.t0 = _context8['catch'](2);
-
-                            reject(_context8.t0);
-
-                          case 11:
-                          case 'end':
-                            return _context8.stop();
-                        }
-                      }
-                    }, _callee8, _this2, [[2, 8]]);
-                  }));
-
-                  return function (_x15) {
-                    return _ref19.apply(this, arguments);
-                  };
-                }());
-              }));
-
-            case 1:
-            case 'end':
-              return _context9.stop();
-          }
-        }
-      }, _callee9, _this2);
-    }));
-
-    return function computeStatByProject() {
-      return _ref18.apply(this, arguments);
-    };
-  }();
-
-  var computeStatByYear = function () {
-    var _ref20 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee11() {
-      return _regeneratorRuntime.wrap(function _callee11$(_context11) {
-        while (1) {
-          switch (_context11.prev = _context11.next) {
-            case 0:
-              return _context11.abrupt('return', new _Promise(function (resolve, reject) {
-                useAcceptors(function () {
-                  var _ref21 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee10(col) {
-                    var map, reduce;
-                    return _regeneratorRuntime.wrap(function _callee10$(_context10) {
-                      while (1) {
-                        switch (_context10.prev = _context10.next) {
-                          case 0:
-                            map = function map() {
-                              // eslint-disable-line
-                              if (this.records) {
-                                this.records.forEach(function (record) {
-                                  // eslint-disable-line
-                                  if (record.isDeleted) return;
-                                  emit(record.date.getYear() + 1900, { // eslint-disable-line
-                                    amount: record.amount / 1000,
-                                    count: 1,
-                                    lastUpdated: record.date
-                                  });
-                                });
-                              }
-                            };
-
-                            reduce = function reduce(key, values) {
-                              // eslint-disable-line
-                              var amount = 0,
-                                  count = 0,
-                                  lastUpdated = 0; // eslint-disable-line
-                              values.forEach(function (val) {
-                                amount += val.amount;
-                                count += val.count;
-                                lastUpdated = Math.max(lastUpdated, +val.lastUpdated);
-                              });
-                              // mongodb 中不支持shorthand
-                              return {
-                                amount: amount, // eslint-disable-line object-shorthand
-                                count: count, // eslint-disable-line object-shorthand
-                                lastUpdated: lastUpdated };
-                            };
-
-                            _context10.prev = 2;
-                            _context10.next = 5;
-                            return col.mapReduce(map, reduce, {
-                              out: {
-                                replace: STAT_BY_YEAR
-                              }
-                            });
-
-                          case 5:
-                            resolve();
-                            _context10.next = 11;
-                            break;
-
-                          case 8:
-                            _context10.prev = 8;
-                            _context10.t0 = _context10['catch'](2);
-
-                            reject(_context10.t0);
-
-                          case 11:
-                          case 'end':
-                            return _context10.stop();
-                        }
-                      }
-                    }, _callee10, _this2, [[2, 8]]);
-                  }));
-
-                  return function (_x16) {
-                    return _ref21.apply(this, arguments);
-                  };
-                }());
-              }));
-
-            case 1:
-            case 'end':
-              return _context11.stop();
-          }
-        }
-      }, _callee11, _this2);
-    }));
-
-    return function computeStatByYear() {
-      return _ref20.apply(this, arguments);
-    };
-  }();
-
-  var findAcceptors = function () {
-    var _ref24 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee14() {
-      var _ref25 = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-      var text = _ref25.text;
-      var year = _ref25.year;
-      var project = _ref25.project;
-      var projections = _ref25.projections;
-      var _ref25$skip = _ref25.skip;
-      var skip = _ref25$skip === undefined ? 0 : _ref25$skip;
-      var _ref25$limit = _ref25.limit;
-      var limit = _ref25$limit === undefined ? 20 : _ref25$limit;
-
-      var condition, reg, _profileManager, find, count, result;
-
-      return _regeneratorRuntime.wrap(function _callee14$(_context14) {
-        while (1) {
-          switch (_context14.prev = _context14.next) {
-            case 0:
-              showLog && console.time('findAcceptors from Profiles');
-              condition = { isAcceptor: true };
-
-              if (text) {
-                reg = new RegExp(text);
-
-                condition = _Object$assign(condition, {
-                  $or: [{ name: reg }, { phone: reg }]
-                });
-              }
-              if (project) {
-                condition = _Object$assign(condition, {
-                  'records.project': project
-                });
-              }
-
-              if (year) {
-                year = parseInt(year, 10); // eslint-disable-line
-                condition = _Object$assign(condition, {
-                  records: {
-                    $elemMatch: {
-                      date: {
-                        $gte: new Date(year, 0, 1),
-                        $lt: new Date(year + 1, 0, 1)
-                      }
-                    }
-                  }
-                });
-              }
-
-              _profileManager = profileManager;
-              find = _profileManager.find;
-              count = _profileManager.count;
-              _context14.prev = 8;
-              _context14.next = 11;
-              return all([count(condition), find(condition)]);
-
-            case 11:
-              result = _context14.sent;
-
-              console.log('result::::::::', result);
-              return _context14.abrupt('return', _Promise.resolve({
-                totalCount: result[0],
-                data: result[1]
-              }));
-
-            case 16:
-              _context14.prev = 16;
-              _context14.t0 = _context14['catch'](8);
-              return _context14.abrupt('return', _Promise.reject(_context14.t0));
-
-            case 19:
-            case 'end':
-              return _context14.stop();
-          }
-        }
-      }, _callee14, _this2, [[8, 16]]);
-    }));
-
-    return function findAcceptors(_x19) {
-      return _ref24.apply(this, arguments);
-    };
-  }();
-
-  /*
-  通过idCard.number找到相应的acceptor
-   */
-  var findByIdCardNumber = function () {
-    var _ref26 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee16(idCardNumber) {
-      return _regeneratorRuntime.wrap(function _callee16$(_context16) {
-        while (1) {
-          switch (_context16.prev = _context16.next) {
-            case 0:
-              return _context16.abrupt('return', new _Promise(function (resolve, reject) {
-                useAcceptors(function () {
-                  var _ref27 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee15(col) {
-                    var doc;
-                    return _regeneratorRuntime.wrap(function _callee15$(_context15) {
-                      while (1) {
-                        switch (_context15.prev = _context15.next) {
-                          case 0:
-                            _context15.prev = 0;
-                            _context15.next = 3;
-                            return col.findOne({ 'idCard.number': idCardNumber });
-
-                          case 3:
-                            doc = _context15.sent;
-
-                            resolve(doc);
-                            _context15.next = 10;
-                            break;
-
-                          case 7:
-                            _context15.prev = 7;
-                            _context15.t0 = _context15['catch'](0);
-
-                            reject(_context15.t0);
-
-                          case 10:
-                          case 'end':
-                            return _context15.stop();
-                        }
-                      }
-                    }, _callee15, _this2, [[0, 7]]);
-                  }));
-
-                  return function (_x22) {
-                    return _ref27.apply(this, arguments);
-                  };
-                }());
-              }));
-
-            case 1:
-            case 'end':
-              return _context16.stop();
-          }
-        }
-      }, _callee16, _this2);
-    }));
-
-    return function findByIdCardNumber(_x21) {
-      return _ref26.apply(this, arguments);
-    };
-  }();
-
-  var remove = function () {
-    var _ref29 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee19(_id) {
-      return _regeneratorRuntime.wrap(function _callee19$(_context19) {
-        while (1) {
-          switch (_context19.prev = _context19.next) {
-            case 0:
-              return _context19.abrupt('return', new _Promise(function (resolve, reject) {
-                return useAcceptors(function () {
-                  var _ref30 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee18(col) {
-                    return _regeneratorRuntime.wrap(function _callee18$(_context18) {
-                      while (1) {
-                        switch (_context18.prev = _context18.next) {
-                          case 0:
-                            _context18.prev = 0;
-                            _context18.next = 3;
-                            return col.remove({ _id: _id });
-
-                          case 3:
-                            _context18.t0 = _context18.sent;
-                            resolve(_context18.t0);
-                            _context18.next = 10;
-                            break;
-
-                          case 7:
-                            _context18.prev = 7;
-                            _context18.t1 = _context18['catch'](0);
-
-                            reject(_context18.t1);
-
-                          case 10:
-                          case 'end':
-                            return _context18.stop();
-                        }
-                      }
-                    }, _callee18, _this2, [[0, 7]]);
-                  }));
-
-                  return function (_x25) {
-                    return _ref30.apply(this, arguments);
-                  };
-                }());
-              }));
-
-            case 1:
-            case 'end':
-              return _context19.stop();
-          }
-        }
-      }, _callee19, _this2);
-    }));
-
-    return function remove(_x24) {
-      return _ref29.apply(this, arguments);
-    };
-  }();
 
   return AcceptorManager;
 

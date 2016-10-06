@@ -156,21 +156,23 @@ export default class AcceptorManager extends EntityManager {
         $or: fieldsForFilter.map(field => ({ [field]: reg })),
       });
     }
-    if (project) {
-      query = Object.assign(query, {
-        'records.project': project,
-      });
-    }
-
-    if (year) {
+    if (project || year) {
+      let elemMatch = {};
+      if (project) {
+        elemMatch = { ...elemMatch, project };
+      }
+      if (year) {
+        elemMatch = {
+          ...elemMatch,
+          date: {
+            $gte: new Date(year, 0, 1),
+            $lt: new Date(year + 1, 0, 1),
+          },
+        };
+      }
       query = Object.assign(query, {
         records: {
-          $elemMatch: {
-            date: {
-              $gte: new Date(year, 0, 1),
-              $lt: new Date(year + 1, 0, 1),
-            },
-          },
+          $elemMatch: elemMatch,
         },
       });
     }
