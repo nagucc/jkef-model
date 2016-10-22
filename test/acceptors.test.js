@@ -250,13 +250,17 @@ describe('AcceptorManager 类', () => {
     //     await manager.computeStatByProject();
     //     const result = await manager.getStatByProject();
     //     expect(result.length).to.be.above(0);
-    //     expect(result.find(item => item._id === 'test').value.amount).to.be.above(0); // eslint-disable-line
+    //     expect(result.find(
+    //      item => item._id === 'test'
+    //     ).value.amount).to.be.above(0);
     //   });
     //   it('按年份统计', async () => {
     //     await manager.computeStatByYear();
     //     const result = await manager.getStatByYear();
     //     expect(result.length).to.be.above(0);
-    //     expect(result.find(item => item._id === 1934).value.amount).to.be.above(0); // eslint-disable-line
+    //     expect(result.find(
+    //      item => item._id === 1934
+    //     ).value.amount).to.be.above(0);
     //   });
     // });
     describe('删除', () => {
