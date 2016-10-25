@@ -251,7 +251,7 @@ describe('AcceptorManager 类', () => {
         const result = await manager.getStatByProject();
         expect(result.length).to.be.above(0);
         expect(result.find(
-         item => item._id === 'test'
+         item => item._id === 'test' // eslint-disable-line no-underscore-dangle
         ).value.amount).to.be.above(0);
       });
       it('按年份统计', async () => {
@@ -259,7 +259,7 @@ describe('AcceptorManager 类', () => {
         const result = await manager.getStatByYear();
         expect(result.length).to.be.above(0);
         expect(result.find(
-         item => item._id === 1934
+         item => item._id === 1934 // eslint-disable-line no-underscore-dangle
         ).value.amount).to.be.above(0);
       });
     });
