@@ -112,9 +112,14 @@ export default class EntityManager {
       try {
         const result = await col.update(condition, updateQuery, options);
         resolve(result);
-      } catch (e) {
-        console.log('[EntityManager update]Error: ', e); // eslint-disable-line no-console
-        reject(e);
+      } catch (error) {
+        console.log('[EntityManager update]Error: ', error); // eslint-disable-line no-console
+        reject({
+          error,
+          condition,
+          updateQuery,
+          options,
+        });
       }
     }));
   }
