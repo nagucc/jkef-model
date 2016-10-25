@@ -156,23 +156,21 @@ export default class AcceptorManager extends EntityManager {
         $or: fieldsForFilter.map(field => ({ [field]: reg })),
       });
     }
-    if (project || year) {
-      let elemMatch = {};
-      if (project) {
-        elemMatch = { ...elemMatch, project };
-      }
-      if (year) {
-        elemMatch = {
-          ...elemMatch,
-          date: {
-            $gte: new Date(year, 0, 1),
-            $lt: new Date(year + 1, 0, 1),
-          },
-        };
-      }
+    if (project) {
+      query = Object.assign(query, {
+        'records.project': project,
+      });
+    }
+
+    if (year) {
       query = Object.assign(query, {
         records: {
-          $elemMatch: elemMatch,
+          $elemMatch: {
+            date: {
+              $gte: new Date(year, 0, 1),
+              $lt: new Date(year + 1, 0, 1),
+            },
+          },
         },
       });
     }
@@ -243,13 +241,18 @@ export default class AcceptorManager extends EntityManager {
     const reduce = (key, values) => {
       let amount = 0;
       let count = 0;
-      let lastUpdated = 0;
+      let lastUpdated = 0; // eslint-disable-line
       values.forEach((val) => {
         amount += val.amount;
         count += val.count;
-        lastUpdated = Math.max(lastUpdated, val.lastUpdated);
+        lastUpdated = Math.max(lastUpdated, +val.lastUpdated);
       });
-      return { amount, count, lastUpdated };
+      // mongodb 中不支持shorthand
+      return {
+        amount: amount, // eslint-disable-line object-shorthand
+        count: count, // eslint-disable-line object-shorthand
+        lastUpdated: lastUpdated, // eslint-disable-line object-shorthand
+      };
     };
 
     return super.mapReduce(map, reduce, {
