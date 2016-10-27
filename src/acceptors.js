@@ -78,16 +78,16 @@ export default class AcceptorManager extends EntityManager {
       return Promise.reject(e);
     }
   }
-  async addRecord(_id, { id, project, amount, date, ...other }) {
+  async addRecord(id, { _id, project, amount, date, ...other }) {
     if (!project || !amount || !date) return Promise.reject('project、amount和date不能为空');
     if (!Number.isInteger(amount)) return Promise.reject('amount必须是整数');
     if (!date.getFullYear) return Promise.reject('date必须是Date类型');
-    if (!id) id = new ObjectId(); // eslint-disable-line no-param-reassign
+    if (!_id) _id = new ObjectId(); // eslint-disable-line
     try {
-      await super.update({ _id }, {
+      await super.update({ _id: id }, {
         $addToSet: {
           records: {
-            _id: id,
+            _id,
             project,
             amount,
             date,
@@ -95,7 +95,7 @@ export default class AcceptorManager extends EntityManager {
           },
         },
       });
-      return Promise.resolve(id);
+      return Promise.resolve(_id); // eslint-disable-line
     } catch (e) {
       return Promise.reject(e);
     }

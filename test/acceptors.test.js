@@ -6,6 +6,7 @@ eslint-env mocha
 import { expect } from 'chai';
 import 'babel-polyfill';
 import AcceptorManager from '../src/acceptors';
+import { ObjectId } from 'mongodb';
 
 const manager = new AcceptorManager('mongodb://localhost/jkef');
 
@@ -203,12 +204,14 @@ describe('AcceptorManager 类', () => {
 
   describe('奖助记录', () => {
     const record = {
+      _id: new ObjectId(), // eslint-disable-line
       project: 'test',
       amount: 98700,
       date: new Date(1934, 4, 4),
       other: 'some',
     };
     const record2 = {
+      _id: new ObjectId(), // eslint-disable-line
       project: 'test2',
       amount: 987400,
       date: new Date(1937, 2, 2),
@@ -232,8 +235,7 @@ describe('AcceptorManager 类', () => {
             }
           })));
       it('正常添加', async () => {
-        record._id = await manager.addRecord(docId, record); // eslint-disable-line
-        expect(record._id).to.be.ok; // eslint-disable-line
+        await manager.addRecord(docId, record); // eslint-disable-line
 
         const result = await manager.findById(docId);
         expect(result.records.some(his =>
@@ -265,12 +267,12 @@ describe('AcceptorManager 类', () => {
     });
     describe('删除', () => {
       it('正常删除', async () => {
-        const idNeedRemove = await manager.addRecord(docId, record2);
+        await manager.addRecord(docId, record2);
 
         let result = await manager.findById(docId);
         expect(result.records.length).to.eql(2);
 
-        await manager.removeRecord(docId, idNeedRemove);
+        await manager.removeRecord(docId, record2._id); // eslint-disable-line
         result = await manager.findById(docId);
         expect(result.records.length).to.eql(1);
       });
