@@ -230,7 +230,7 @@ export default class AcceptorManager extends EntityManager {
       if (this.records) {
         this.records.forEach(record => {
           if (record.isDeleted) return;
-          emit(record.date.getFullYear() + 1900, { // eslint-disable-line
+          emit(record.date.getFullYear(), { // eslint-disable-line
             amount: record.amount / 1000,
             count: 1,
             lastUpdated: record.date,

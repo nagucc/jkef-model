@@ -1,6 +1,6 @@
 {
   "name": "jkef-model",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "jkef项目服务器端模型定义",
   "main": "dist/index.js",
   "scripts": {
