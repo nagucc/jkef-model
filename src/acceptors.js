@@ -163,12 +163,13 @@ export default class AcceptorManager extends EntityManager {
     }
 
     if (year) {
+      year = parseInt(year, 10);
       query = Object.assign(query, {
         records: {
           $elemMatch: {
             date: {
               $gte: new Date(year, 0, 1),
-              $lt: new Date(year + 1, 0, 1),
+              $lt: new Date(++year, 0, 1),
             },
           },
         },
