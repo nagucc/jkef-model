@@ -21,6 +21,7 @@
   _inherits = 'default' in _inherits ? _inherits['default'] : _inherits;
   _JSON$stringify = 'default' in _JSON$stringify ? _JSON$stringify['default'] : _JSON$stringify;
 
+  // eslint-disable-line import/no-unresolved
   // import { ObjectId } from 'mongodb';
 
   var EntityManager = function () {
@@ -336,17 +337,21 @@
                       result = _context6.sent;
 
                       resolve(result);
-                      _context6.next = 11;
+                      _context6.next = 10;
                       break;
 
                     case 7:
                       _context6.prev = 7;
                       _context6.t0 = _context6['catch'](0);
 
-                      console.log('[EntityManager update]Error: ', _context6.t0); // eslint-disable-line no-console
-                      reject(_context6.t0);
+                      reject({
+                        error: _context6.t0,
+                        condition: condition,
+                        updateQuery: updateQuery,
+                        options: options
+                      });
 
-                    case 11:
+                    case 10:
                     case 'end':
                       return _context6.stop();
                   }
@@ -651,13 +656,13 @@
     }, {
       key: 'addRecord',
       value: function () {
-        var _ref9 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee4(_id, _ref10) {
-          var id = _ref10.id;
+        var _ref9 = _asyncToGenerator(_regeneratorRuntime.mark(function _callee4(id, _ref10) {
+          var _id = _ref10._id;
           var project = _ref10.project;
           var amount = _ref10.amount;
           var date = _ref10.date;
 
-          var other = _objectWithoutProperties(_ref10, ['id', 'project', 'amount', 'date']);
+          var other = _objectWithoutProperties(_ref10, ['_id', 'project', 'amount', 'date']);
 
           return _regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
@@ -687,13 +692,13 @@
                   return _context4.abrupt('return', _Promise.reject('date必须是Date类型'));
 
                 case 6:
-                  if (!id) id = new mongodb.ObjectId(); // eslint-disable-line no-param-reassign
+                  if (!_id) _id = new mongodb.ObjectId(); // eslint-disable-line
                   _context4.prev = 7;
                   _context4.next = 10;
-                  return _get(AcceptorManager.prototype.__proto__ || _Object$getPrototypeOf(AcceptorManager.prototype), 'update', this).call(this, { _id: _id }, {
+                  return _get(AcceptorManager.prototype.__proto__ || _Object$getPrototypeOf(AcceptorManager.prototype), 'update', this).call(this, { _id: id }, {
                     $addToSet: {
                       records: _extends({
-                        _id: id,
+                        _id: _id,
                         project: project,
                         amount: amount,
                         date: date
@@ -702,7 +707,7 @@
                   });
 
                 case 10:
-                  return _context4.abrupt('return', _Promise.resolve(id));
+                  return _context4.abrupt('return', _Promise.resolve(_id));
 
                 case 13:
                   _context4.prev = 13;
@@ -870,7 +875,7 @@
           var _ref16$fieldsForFilte = _ref16.fieldsForFilter;
           var fieldsForFilter = _ref16$fieldsForFilte === undefined ? ['name', 'phone'] : _ref16$fieldsForFilte;
 
-          var query, _ret2, elemMatch, result;
+          var query, _ret2, result;
 
           return _regeneratorRuntime.wrap(function _callee7$(_context7) {
             while (1) {
@@ -905,48 +910,47 @@
                   return _context7.abrupt('return', _ret2.v);
 
                 case 5:
-                  if (project || year) {
-                    elemMatch = {};
+                  if (project) {
+                    query = _Object$assign(query, {
+                      'records.project': project
+                    });
+                  }
 
-                    if (project) {
-                      elemMatch = _extends({}, elemMatch, { project: project });
-                    }
-                    if (year) {
-                      elemMatch = _extends({}, elemMatch, {
-                        date: {
-                          $gte: new Date(year, 0, 1),
-                          $lt: new Date(year + 1, 0, 1)
-                        }
-                      });
-                    }
+                  if (year) {
+                    year = parseInt(year, 10);
                     query = _Object$assign(query, {
                       records: {
-                        $elemMatch: elemMatch
+                        $elemMatch: {
+                          date: {
+                            $gte: new Date(year, 0, 1),
+                            $lt: new Date(++year, 0, 1)
+                          }
+                        }
                       }
                     });
                   }
-                  _context7.prev = 6;
-                  _context7.next = 9;
+                  _context7.prev = 7;
+                  _context7.next = 10;
                   return _Promise.all([_get(AcceptorManager.prototype.__proto__ || _Object$getPrototypeOf(AcceptorManager.prototype), 'count', this).call(this, query), _get(AcceptorManager.prototype.__proto__ || _Object$getPrototypeOf(AcceptorManager.prototype), 'find', this).call(this, { query: query, skip: skip, limit: limit })]);
 
-                case 9:
+                case 10:
                   result = _context7.sent;
                   return _context7.abrupt('return', _Promise.resolve({
                     totalCount: result[0],
                     data: result[1]
                   }));
 
-                case 13:
-                  _context7.prev = 13;
-                  _context7.t0 = _context7['catch'](6);
+                case 14:
+                  _context7.prev = 14;
+                  _context7.t0 = _context7['catch'](7);
                   return _context7.abrupt('return', _Promise.reject(_context7.t0));
 
-                case 16:
+                case 17:
                 case 'end':
                   return _context7.stop();
               }
             }
-          }, _callee7, this, [[6, 13]]);
+          }, _callee7, this, [[7, 14]]);
         }));
 
         function listByRecord(_x13) {
@@ -1003,7 +1007,7 @@
           if (this.records) {
             this.records.forEach(function (record) {
               if (record.isDeleted) return;
-              emit(record.date.getYear() + 1900, { // eslint-disable-line
+              emit(record.date.getFullYear(), { // eslint-disable-line
                 amount: record.amount / 1000,
                 count: 1,
                 lastUpdated: record.date
@@ -1014,13 +1018,17 @@
         var reduce = function reduce(key, values) {
           var amount = 0;
           var count = 0;
-          var lastUpdated = 0;
+          var lastUpdated = 0; // eslint-disable-line
           values.forEach(function (val) {
             amount += val.amount;
             count += val.count;
-            lastUpdated = Math.max(lastUpdated, val.lastUpdated);
+            lastUpdated = Math.max(lastUpdated, +val.lastUpdated);
           });
-          return { amount: amount, count: count, lastUpdated: lastUpdated };
+          // mongodb 中不支持shorthand
+          return {
+            amount: amount, // eslint-disable-line object-shorthand
+            count: count, // eslint-disable-line object-shorthand
+            lastUpdated: lastUpdated };
         };
 
         return _get(AcceptorManager.prototype.__proto__ || _Object$getPrototypeOf(AcceptorManager.prototype), 'mapReduce', this).call(this, map, reduce, {

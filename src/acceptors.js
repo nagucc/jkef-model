@@ -156,25 +156,49 @@ export default class AcceptorManager extends EntityManager {
         $or: fieldsForFilter.map(field => ({ [field]: reg })),
       });
     }
-    if (project) {
-      query = Object.assign(query, {
-        'records.project': project,
-      });
-    }
-
-    if (year) {
-      year = parseInt(year, 10);
-      query = Object.assign(query, {
-        records: {
-          $elemMatch: {
-            date: {
-              $gte: new Date(year, 0, 1),
-              $lt: new Date(++year, 0, 1),
-            },
+    // 项目名称及年份应当对应到同一个record中同时匹配。
+    if (project || year) {
+      // 生成$elemMatch参数
+      let elemMatch = {};
+      if (project) {
+        elemMatch = { project };
+      }
+      if (year) {
+        year = parseInt(year, 10);
+        elemMatch = {
+          ...elemMatch,
+          date: {
+            $gte: new Date(year, 0, 1),
+            $lt: new Date(++year, 0, 1),
           },
+        };
+      }
+      query = {
+        ...query,
+        records: {
+          $elemMatch: elemMatch,
         },
-      });
+      };
     }
+    // if (project) {
+    //   query = Object.assign(query, {
+    //     'records.project': project,
+    //   });
+    // }
+
+    // if (year) {
+    //   year = parseInt(year, 10);
+    //   query = Object.assign(query, {
+    //     records: {
+    //       $elemMatch: {
+    //         date: {
+    //           $gte: new Date(year, 0, 1),
+    //           $lt: new Date(++year, 0, 1),
+    //         },
+    //       },
+    //     },
+    //   });
+    // }
     try {
       const result = await Promise.all([
         super.count(query),
